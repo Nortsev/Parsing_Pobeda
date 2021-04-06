@@ -3,4 +3,5 @@ venv
 .idea/vcs.xml
 .DS_Store
 img
-"...\\img.jpg"
+...\\img.jpg
+env
