@@ -2,10 +2,11 @@
 import requests
 from bs4 import BeautifulSoup
 import random
+import base_sqllite as sql
 
 link = [
-    "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/telefony/sotovye-telefony/?k=false&q=20&s=high&c=57&cg=143&a=0&f[]=400&",
-    "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/kompyuternaya-tehnika/?k=false&q=20&s=high&c=57&cg=99&a=0&f[]=400&",
+    # "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/telefony/sotovye-telefony/?k=false&q=20&s=high&c=57&cg=143&a=0&f[]=400&",
+    # "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/kompyuternaya-tehnika/?k=false&q=20&s=high&c=57&cg=99&a=0&f[]=400&",
     "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/instrument/?k=false&q=20&s=high&c=57&cg=84&a=0&f[]=400&"
 ]
 HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
@@ -38,14 +39,15 @@ def get_content(html):
                          "url_photo": url_photo,
                          "photo": photo
                          })
+        conn = sql.create_database()
+        sql.insert_products(conn, products)
 
     return products
 
+
 def save_img(products):
     for i in range(len(products)):
-
-        with open(f'img/photo_{i}.jpg','wb') as f:
-
+        with open(f'img/photo_{i}.jpg', 'wb') as f:
             f.write(products[i]["photo"])
 
 
@@ -56,9 +58,6 @@ def main():
 
     products = get_content(html.text)
     save_img(products)
-
-
-
 
 
 main()
