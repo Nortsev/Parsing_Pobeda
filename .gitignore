@@ -5,3 +5,5 @@ venv
 img
 ...\\img.jpg
 env
+post_vk.db
+__pycache__/
