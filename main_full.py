@@ -3,53 +3,56 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import base_sqllite as sql
-import time
-
 
 link = [
+
     "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/telefony/sotovye-telefony/?k=false&q=20&s=high&c=57&cg=143&a=0&f[]=400&",
-    # "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/kompyuternaya-tehnika/?k=false&q=20&s=high&c=57&cg=99&a=0&f[]=400&",
-    # "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/instrument/?k=false&q=20&s=high&c=57&cg=84&a=0&f[]=400&"
+    "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/kompyuternaya-tehnika/?k=false&q=20&s=high&c=57&cg=99&a=0&f[]=400&",
+    "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/instrument/?k=false&q=20&s=high&c=57&cg=84&a=0&f[]=400&"
 ]
 HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                          '(KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'}
 
-TOP_ITEMS = 10
+TOP_ITEMS = 5
 DOMAIN = "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/"
 
 
-def get_html(url, params=None):
+def get_html(url: str, params=None):
     return requests.get(url, headers=HEADERS, params=params)
 
 
-def get_content(html):
+def get_content(html: str) -> list:
     soup = BeautifulSoup(html, 'html.parser')
-    items = soup.find_all("div", attrs={"am-card-info": True})
+    items = soup.find_all("div", attrs={"am-card": "normal"})
     products = []
-    for i in range(TOP_ITEMS):
-        if len(products) <= 5:
-            try:
-                title = items[i].find('meta', attrs={"itemprop": "name"})['content'],
-                price = items[i].find('span', attrs={"am-card-price": True})["content"],
-                url = items[i].find('a', attrs={"am-card-title": True})['href']
 
-                url_photo = DOMAIN + \
-                            BeautifulSoup(get_html(url).text, "html.parser").find('img', attrs={"am-image-item": True})[
-                                'am-original']
-                photo = requests.get(url_photo).content
-                products.append({"title": title[0],
-                                 "price": price[0],
-                                 "url": url,
-                                 "url_photo": url_photo,
-                                 "photo": photo,
-                                 "time": (time.ctime(time.time()))
-                                 })
-                conn = sql.create_database()
-                sql.insert_products(conn, products)
-            except Exception:
-                continue
-        else:
+    for item in items:
+        if len(products) >= TOP_ITEMS:
             break
+
+        # Continue if item does not have photo
+        image_path = item.find("img", attrs={"itemprop": "image"})['src']
+        if "noimage" in image_path:
+            continue
+
+        title = item.find('meta', attrs={"itemprop": "name"})['content']
+        price = item.find('span', attrs={"am-card-price": True})["content"]
+        url = item.find('a', attrs={"am-card-title": True})['href']
+
+        url_photo = DOMAIN + \
+                    BeautifulSoup(get_html(url).text, "html.parser").find('img', attrs={"am-image-item": True})[
+                        'am-original']
+        photo = requests.get(url_photo).content
+        products.append({"title": title,
+                         "price": price,
+                         "url": url,
+                         "url_photo": url_photo,
+                         "photo": photo
+
+                         })
+
+    conn = sql.create_connection()
+    sql.insert_products(conn, products)
 
     return products
 
@@ -62,5 +65,5 @@ def main():
     get_content(html.text)
 
 
-
-main()
+if __name__ == "__main__":
+    main()
