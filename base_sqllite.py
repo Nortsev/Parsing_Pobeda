@@ -1,5 +1,5 @@
-import sqlite3, os
-import json
+import sqlite3
+
 
 database_file = 'post_vk.db'
 sql_create = """ CREATE TABLE IF NOT EXISTS top_items(
@@ -8,7 +8,8 @@ sql_create = """ CREATE TABLE IF NOT EXISTS top_items(
                     price TEXT NOT NULL,
                     url TEXT NOT NULL,
                     url_photo TEXT NOT NULL,
-                    photo BLOB NOT NULL
+                    photo BLOB NOT NULL,
+                    date_parsing TIME NOT NULL
                 );"""
 
 
@@ -25,7 +26,7 @@ def create_database(database=database_file):
 
 def insert_products(conn, products):
     try:
-        sql = """INSERT INTO top_items(title,price,url,url_photo,photo) VALUES(?, ?, ?, ?, ?)"""
+        sql = """INSERT INTO top_items(title,price,url,url_photo,photo,date_parsing) VALUES(?, ?, ?, ?, ?, ?)"""
         cur = conn.cursor()
         for product in products:
             cur.execute(sql, list(product.values()))
