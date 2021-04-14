@@ -7,3 +7,5 @@ img
 env
 post_vk.db
 __pycache__/
+config.py
+vk_config.v2.json
