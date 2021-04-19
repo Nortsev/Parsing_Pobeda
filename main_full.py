@@ -3,6 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import base_sqllite as sql
+import TEST_IMAGE_BASE as save_img
+import vk_api_pobeda as vk_api
 
 link = [
 
@@ -48,7 +50,6 @@ def get_content(html: str) -> list:
                          "url": url,
                          "url_photo": url_photo,
                          "photo": photo
-
                          })
 
     conn = sql.create_connection()
@@ -57,13 +58,22 @@ def get_content(html: str) -> list:
     return products
 
 
+
+
 def main():
+
     html = get_html(random.choice(link))
     if html.status_code != 200:
         print("Error conect")
 
     get_content(html.text)
+    save_img.start()
+    photos = ["img/1.jpg", "img/2.jpg", "img/3.jpg", "img/4.jpg", "img/5.jpg"]
+    captions = ['1\ntest', '2', '3', '4', '5']
+    vk_api.post_group_wall(photos, captions, album_id=279184675)
 
 
 if __name__ == "__main__":
     main()
+
+

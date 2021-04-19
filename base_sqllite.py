@@ -14,6 +14,7 @@ sql_create = """ CREATE TABLE IF NOT EXISTS top_items(
                 );"""
 
 
+
 def create_connection(database=database_file):
     """Create connection to database"""
     conn = None
@@ -45,3 +46,13 @@ def insert_products(conn, products: list) -> bool:
 
 
 
+
+def delete_base(conn):
+    """Delete last info in database"""
+    try:
+        sql = """DELETE FROM top_items WHERE id > 20"""
+        cur = conn.cursor()
+        cur.execute(sql)
+        print("ok")
+    except Exception as e:
+        print('error delete base')
