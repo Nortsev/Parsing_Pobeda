@@ -5,7 +5,7 @@ import vk_api_pobeda as post
 
 conn = sql.create_connection()
 IMAGE_DIR = 'img'
-get_image_sql = '''SELECT title , price , photo FROM top_items ORDER BY retrieved_time DESC LIMIT {img_count}'''
+get_image_sql = '''SELECT title , price , photo , url FROM top_items ORDER BY retrieved_time DESC LIMIT {img_count}'''
 
 
 def write_image(file_name, img):
@@ -34,10 +34,12 @@ def export_image(conn, img_count=5):
         write_image(image_path, product[2])
         result.append({'title': product[0],
                        'price': product[1],
-                       'image': image_path})
+                       'image': image_path,
+                       'url': product[3]})
         image_name += 1
     return result
 
 
 def start():
-    export_image(conn)
+    product = export_image(conn)
+    return product

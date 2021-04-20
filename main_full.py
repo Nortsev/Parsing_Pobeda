@@ -58,22 +58,22 @@ def get_content(html: str) -> list:
     return products
 
 
-
-
 def main():
-
     html = get_html(random.choice(link))
     if html.status_code != 200:
         print("Error conect")
 
     get_content(html.text)
-    save_img.start()
-    photos = ["img/1.jpg", "img/2.jpg", "img/3.jpg", "img/4.jpg", "img/5.jpg"]
-    captions = ['1\ntest', '2', '3', '4', '5']
+    products = save_img.start()
+    photos = [product['image'] for product in products]
+    captions = [f"{product['title']} \n  Цена: {product['price']} \n Ссылка на товар на нашем сайте: {product['url']}"
+                for product in products]
+    # for product in products:
+    #     photos.append(product['image'])
+    #     captions.append(f"{product['title']} \n  Цена: {product['price']}")
+
     vk_api.post_group_wall(photos, captions, album_id=279184675)
 
 
 if __name__ == "__main__":
     main()
-
-
