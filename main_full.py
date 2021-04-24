@@ -2,9 +2,10 @@
 import requests
 from bs4 import BeautifulSoup
 import random
-import base_sqllite as sql
-import TEST_IMAGE_BASE as save_img
+from base_sqllite import SQLApi
+#from vk_api_pobeda import VKApi
 import vk_api_pobeda as vk_api
+import config
 
 ALBUM_NAME = 'Repost'
 link = [
@@ -55,19 +56,22 @@ def get_content(html: str) -> list:
                          "photo": photo
                          })
 
-    conn = sql.create_connection()
-    sql.insert_products(conn, products)
-
     return products
 
 
 def main():
+    # Initialize SQLApi
+    sql_api = SQLApi()
+    # Initialize VKApi
+    # vk_api =VKApi(config.login, config.password)
     html = get_html(random.choice(link))
     if html.status_code != 200:
         print("Error conect")
 
-    get_content(html.text)
-    products = save_img.start()
+    web_products = get_content(html.text)
+    sql_api.insert_products(web_products)
+    products = sql_api.get_images()
+
     photos = [product['image'] for product in products]
     captions = [f"{product['title']} \n  Цена: {product['price']} \n Ссылка на товар на нашем сайте: {product['url']}"
                 for product in products]
