@@ -3,11 +3,11 @@ import requests
 from bs4 import BeautifulSoup
 import random
 from base_sqllite import SQLApi
-#from vk_api_pobeda import VKApi
-import vk_api_pobeda as vk_api
+from vk_api_pobeda import VKApi
+# import vk_api_pobeda as vk_api
 import config
 
-ALBUM_NAME = 'Repost'
+
 link = [
 
     "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/telefony/sotovye-telefony/?k=false&q=20&s=high&c=57&cg=143&a=0&f[]=400&",
@@ -63,7 +63,7 @@ def main():
     # Initialize SQLApi
     sql_api = SQLApi()
     # Initialize VKApi
-    # vk_api =VKApi(config.login, config.password)
+    vk_api = VKApi(config)
     html = get_html(random.choice(link))
     if html.status_code != 200:
         print("Error conect")
@@ -75,8 +75,7 @@ def main():
     photos = [product['image'] for product in products]
     captions = [f"{product['title']} \n  Цена: {product['price']} \n Ссылка на товар на нашем сайте: {product['url']}"
                 for product in products]
-    create_session = vk_api.create_session()
-    album_id = vk_api.get_album_id(create_session, ALBUM_NAME)
+    album_id = vk_api.get_album_id()
     vk_api.post_group_wall(photos, captions, album_id=album_id)
 
 
