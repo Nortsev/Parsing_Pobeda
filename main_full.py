@@ -4,18 +4,8 @@ from bs4 import BeautifulSoup
 import random
 from base_sqllite import SQLApi
 from vk_api_pobeda import VKApi
-# import vk_api_pobeda as vk_api
 import config
 
-
-link = [
-
-    "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/telefony/sotovye-telefony/?k=false&q=20&s=high&c=57&cg=143&a=0&f[]=400&",
-    "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/kompyuternaya-tehnika/?k=false&q=20&s=high&c=57&cg=99&a=0&f[]=400&",
-    "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/catalog/instrument/?k=false&q=20&s=high&c=57&cg=84&a=0&f[]=400&",
-    "https://энгельс.победа-63.рф/catalog/avto/?k=false&q=20&s=high&c=57&cg=132&a=0&f[]=400&",
-
-]
 HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                          '(KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'}
 
@@ -64,7 +54,7 @@ def main():
     sql_api = SQLApi()
     # Initialize VKApi
     vk_api = VKApi(config)
-    html = get_html(random.choice(link))
+    html = get_html(random.choice(config.link))
     if html.status_code != 200:
         print("Error conect")
 
