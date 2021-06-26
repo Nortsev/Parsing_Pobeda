@@ -5,6 +5,7 @@ import random
 from base_sqllite import SQLApi
 from vk_api_pobeda import VKApi
 import config
+import re
 
 HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                          '(KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'}
@@ -28,10 +29,12 @@ def get_content(html: str) -> list:
 
         # Continue if item does not have photo
         image_path = item.find("img", attrs={"itemprop": "image"})['src']
-        if "noimage" in image_path:
+        title = item.find('meta', attrs={"itemprop": "name"})['content']
+        if "noimage" in image_path or re.search(r'\b[Aa]pple\b|\b[Ii][Pp]hone\b|\b[Mm]ac[Bb]ook\b|\b[Aa]ir[Pp]ods', title):
             continue
 
-        title = item.find('meta', attrs={"itemprop": "name"})['content']
+
+
         price = item.find('span', attrs={"am-card-price": True})["content"]
         url = item.find('a', attrs={"am-card-title": True})['href']
 
