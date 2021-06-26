@@ -30,7 +30,7 @@ def get_content(html: str) -> list:
         # Continue if item does not have photo
         image_path = item.find("img", attrs={"itemprop": "image"})['src']
         title = item.find('meta', attrs={"itemprop": "name"})['content']
-        if "noimage" in image_path or re.search(r'\b[Aa]pple\b|\b[Ii][Pp]hone\b|\b[Mm]ac[Bb]ook\b|\b[Aa]ir[Pp]ods', title):
+        if "noimage" in image_path or re.search(config.filter, title, re.IGNORECASE):
             continue
 
 
