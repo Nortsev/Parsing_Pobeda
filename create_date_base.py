@@ -81,6 +81,7 @@ class SQLApi:
                            'image': image_path,
                            'url': product[3]})
             image_name += 1
+            print(type(result))
         return result
 
 
