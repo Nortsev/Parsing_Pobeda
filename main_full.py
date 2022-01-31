@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import telegram
+from config import token_telegram
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
 import requests
 from bs4 import BeautifulSoup
 import random
@@ -6,6 +10,11 @@ from create_date_base import SQLApi
 from vk_api_pobeda import VKApi
 import config
 import re
+
+bot = telegram.Bot(token=token_telegram)
+
+updater = Updater(token=token_telegram, use_context=True)
+dispatcher = updater.dispatcher
 
 HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                          '(KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'}
@@ -18,7 +27,7 @@ def get_html(url: str, params=None):
     return requests.get(url, headers=HEADERS, params=params)
 
 
-def get_content(html):
+def get_content(html, update, context):
     soup = BeautifulSoup(html.text, 'html.parser')
     items = soup.find_all("div", attrs={"card"})
     products = []
@@ -43,10 +52,12 @@ def get_content(html):
                          "photo": photo
                          })
         print(f'Продукт {title} добавлен')
+        context.bot.send_message(chat_id=update.effective_chat.id, text=f'Продукт {title} добавлен c ценой {price}')
+        context.bot.send_photo(chat_id=update.effective_chat.id, photo=photo)
     return products
 
 
-def main():
+def main(update, context):
     # Initialize SQLApi
     sql_api = SQLApi()
     # Initialize VKApi
@@ -55,16 +66,25 @@ def main():
     if html.status_code != 200:
         print("Error conect")
 
-    web_products = get_content(html)
+    web_products = get_content(html, update, context)
     sql_api.insert_products(web_products)
     products = sql_api.get_images()
 
     photos = [product['image'] for product in products]
-    captions = [f"{product['title']} \n  Цена: {product['price']} руб\n Ссылка на товар на нашем сайте: {product['url']}"
-                for product in products]
+    captions = [
+        f"{product['title']} \n  Цена: {product['price']} руб\n Ссылка на товар на нашем сайте: {product['url']}"
+        for product in products]
     album_id = vk_api.get_album_id()
     vk_api.post_group_wall(photos, captions, album_id=album_id)
 
 
 if __name__ == "__main__":
-    main()
+    def start(update, context):
+        context.bot.send_message(chat_id=update.effective_chat.id, text='Формирую пост Космонавтов 19')
+        main(update, context)
+        context.bot.send_message(chat_id=update.effective_chat.id, text='Пост вк готов и опубликован')
+
+
+    start_headler = CommandHandler('start', start)
+    dispatcher.add_handler(start_headler)
+    updater.start_polling()
