@@ -6,7 +6,6 @@ from create_date_base import SQLApi
 from vk_api_pobeda import VKApi
 import config
 import re
-
 HEADERS = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                          '(KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'}
 
@@ -16,7 +15,6 @@ DOMAIN = "https://xn--c1aesfx9dc.xn---63-5cdesg4ei.xn--p1ai/"
 
 def get_html(url: str, params=None):
     return requests.get(url, headers=HEADERS, params=params)
-
 
 def get_content(html, update, context):
     soup = BeautifulSoup(html.text, 'html.parser')
